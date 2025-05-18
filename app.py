@@ -19,8 +19,11 @@ if uploaded_file:
         st.info("🔍 Showing only products with enough data for forecasting (2+ records)")
         product = st.selectbox("Select a product", valid_products)
 
+        # Add this right after the product selectbox
+        forecast_days = st.selectbox("📆 Forecast range", [7, 30, 90, 180, 360], index=1)
+        
         if st.button("Generate Forecast"):
-            forecast_df, fig = forecast_product_demand(cleaned_df, product)
+            forecast_df, fig = forecast_product_demand(cleaned_df, product, forecast_days)
             st.pyplot(fig)
 
             ai = OllamaProvider()
@@ -29,6 +32,8 @@ if uploaded_file:
             st.subheader("🧠 AI Summary")
             st.write(summary)
 
+            st.success(f"✅ Forecast generated for {forecast_days} days.")
+            
             st.download_button("Download Forecast CSV", forecast_df.to_csv(index=False), "forecast.csv")
     else:
         st.warning("No products have enough data to generate a forecast.")
