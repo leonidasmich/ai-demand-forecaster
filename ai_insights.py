@@ -1,11 +1,20 @@
+import streamlit as st
 import ollama
 
-class OllamaProvider:
-    def summarize_forecast(self, forecast_df, product_name):
-        prompt = f"""Analyze this demand forecast for '{product_name}' and summarize any trends, spikes, or drops in simple terms. Include possible reasons if applicable.
+@st.cache_data(show_spinner=False)
+def summarize_forecast_with_cache(product_name: str, forecast_tail_csv: str) -> str:
+    prompt = f"""
+        Analyze the demand forecast for the product "{product_name}" and provide:
 
-        {forecast_df.tail(10).to_string(index=False)}
+        1. A summary of the overall trend (e.g., growth, decline, stability, unusual patterns).
+        2. An interpretation of any seasonality components (e.g., weekly or monthly peaks and dips).
+        3. Practical recommendations for inventory planning or marketing strategy.
+        4. Include possible reasons if applicable.
+        5. If the forecast shows a significant increase or decrease, suggest a percentage change in inventory.
+        6. If the forecast shows a seasonal peak, suggest the best time for a promotional campaign.
+
+        Here is the forecast data (last 30 days of predictions):
+        {forecast_tail_csv}
         """
-        response = ollama.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
-        return response['message']['content']
- 
+    response = ollama.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+    return response['message']['content']

@@ -18,4 +18,7 @@ def forecast_product_demand(df: pd.DataFrame, product_name: str, forecast_days: 
     forecast = model.predict(future)
 
     fig = model.plot(forecast)
-    return forecast, fig
+    fig.set_size_inches(8, 4)
+
+    return forecast, fig, model
+
